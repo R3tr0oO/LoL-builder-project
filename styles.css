@@ -604,7 +604,7 @@ body {
     gap: var(--space-xs);
     overflow-y: auto;
     /* 10 lignes max × ~54px par item */
-    max-height: calc(10 * 54px);
+    max-height: 500px;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: thin;
     scrollbar-color: var(--gold) rgba(0, 0, 0, 0.3);

@@ -62,6 +62,20 @@ const elements = {
     itemsTab: document.getElementById('itemsTab'),
     runesTab: document.getElementById('runesTab'),
     
+    // Abilities
+    abilitiesToggle: document.getElementById('abilitiesToggle'),
+    abilitiesContainer: document.getElementById('abilitiesContainer'),
+    passiveSlot: document.getElementById('passiveSlot'),
+    qSlot: document.getElementById('qSlot'),
+    wSlot: document.getElementById('wSlot'),
+    eSlot: document.getElementById('eSlot'),
+    rSlot: document.getElementById('rSlot'),
+    passiveName: document.getElementById('passiveName'),
+    qName: document.getElementById('qName'),
+    wName: document.getElementById('wName'),
+    eName: document.getElementById('eName'),
+    rName: document.getElementById('rName'),
+    
     // Runes
     primaryTreeSelector: document.getElementById('primaryTreeSelector'),
     secondaryTreeSelector: document.getElementById('secondaryTreeSelector'),
@@ -104,6 +118,7 @@ function init() {
     renderItems();
     renderTreeSelectors();
     renderShards();
+    renderAbilities();
     updateChampionDisplay();
     updateChampionStats();
     updateFinalStats();
@@ -191,6 +206,15 @@ function setupEventListeners() {
             document.getElementById(tabName + 'Tab').classList.add('active');
         });
     });
+    
+    // Abilities toggle
+    elements.abilitiesToggle.addEventListener('click', () => {
+        elements.abilitiesToggle.classList.toggle('collapsed');
+        elements.abilitiesContainer.classList.toggle('collapsed');
+    });
+    
+    // Abilities tooltips
+    setupAbilityTooltips();
     
     // Slots
     document.querySelectorAll('.slot').forEach(slot => {
@@ -418,6 +442,9 @@ function updateChampionDisplay() {
     
     elements.champStatsIcon.textContent = champ.icon;
     elements.champStatsName.textContent = champ.name;
+    
+    // Update abilities
+    renderAbilities();
 }
 
 // Mise à jour des stats du champion
@@ -943,6 +970,199 @@ function showRuneTooltip(rune, color, event) {
 }
 
 function hideRuneTooltip() {
+    elements.tooltip.classList.remove('active');
+}
+
+// ============================================
+// CHAMPION ABILITIES FUNCTIONS
+// ============================================
+
+// Rendu des compétences du champion
+function renderAbilities() {
+    const champ = state.selectedChampion;
+    
+    // Check if champion has abilities data
+    if (!champ.passive || !champ.spells) {
+        elements.passiveName.textContent = 'N/A';
+        elements.qName.textContent = 'N/A';
+        elements.wName.textContent = 'N/A';
+        elements.eName.textContent = 'N/A';
+        elements.rName.textContent = 'N/A';
+        return;
+    }
+    
+    // Update ability names
+    elements.passiveName.textContent = champ.passive.name;
+    elements.qName.textContent = champ.spells.Q.name;
+    elements.wName.textContent = champ.spells.W.name;
+    elements.eName.textContent = champ.spells.E.name;
+    elements.rName.textContent = champ.spells.R.name;
+    
+    // Update icons with champion-specific icons
+    const passiveIcon = elements.passiveSlot.querySelector('.ability-icon');
+    const qIcon = elements.qSlot.querySelector('.ability-icon');
+    const wIcon = elements.wSlot.querySelector('.ability-icon');
+    const eIcon = elements.eSlot.querySelector('.ability-icon');
+    const rIcon = elements.rSlot.querySelector('.ability-icon');
+    
+    passiveIcon.textContent = champ.passive.icon;
+    qIcon.textContent = champ.spells.Q.icon;
+    wIcon.textContent = champ.spells.W.icon;
+    eIcon.textContent = champ.spells.E.icon;
+    rIcon.textContent = champ.spells.R.icon;
+}
+
+// Setup des tooltips pour les compétences
+function setupAbilityTooltips() {
+    const slots = [
+        { element: elements.passiveSlot, type: 'passive' },
+        { element: elements.qSlot, type: 'Q' },
+        { element: elements.wSlot, type: 'W' },
+        { element: elements.eSlot, type: 'E' },
+        { element: elements.rSlot, type: 'R' },
+    ];
+    
+    slots.forEach(({ element, type }) => {
+        element.addEventListener('mouseenter', (e) => {
+            showAbilityTooltip(type, e);
+        });
+        
+        element.addEventListener('mouseleave', () => {
+            hideAbilityTooltip();
+        });
+        
+        element.addEventListener('mousemove', (e) => {
+            if (elements.tooltip.classList.contains('active')) {
+                positionTooltip(e);
+            }
+        });
+    });
+}
+
+// Afficher le tooltip d'une compétence
+function showAbilityTooltip(type, event) {
+    const champ = state.selectedChampion;
+    
+    if (!champ.passive || !champ.spells) return;
+    
+    let ability, keyLabel, iconClass;
+    
+    if (type === 'passive') {
+        ability = champ.passive;
+        keyLabel = 'PASSIF';
+        iconClass = 'passive';
+    } else {
+        ability = champ.spells[type];
+        keyLabel = type;
+        iconClass = type === 'R' ? 'ultimate' : '';
+    }
+    
+    if (!ability) return;
+    
+    // Build stats HTML
+    let statsHtml = '';
+    
+    if (type === 'passive') {
+        statsHtml = `
+            <div class="ability-stat-row">
+                <span class="ability-stat-label">Cooldown</span>
+                <span class="ability-stat-value cooldown">${ability.cooldown || 'Passif'}</span>
+            </div>
+            <div class="ability-stat-row">
+                <span class="ability-stat-label">Scaling</span>
+                <span class="ability-stat-value">${ability.scaling || 'N/A'}</span>
+            </div>
+        `;
+    } else {
+        statsHtml = `
+            <div class="ability-stat-row">
+                <span class="ability-stat-label">Cooldown</span>
+                <span class="ability-stat-value cooldown">${ability.cooldown || 'N/A'}</span>
+            </div>
+            <div class="ability-stat-row">
+                <span class="ability-stat-label">Coût</span>
+                <span class="ability-stat-value cost">${ability.cost || 'Aucun'}</span>
+            </div>
+            <div class="ability-stat-row">
+                <span class="ability-stat-label">Dégâts</span>
+                <span class="ability-stat-value damage">${ability.damage || 'Aucun'}</span>
+            </div>
+        `;
+    }
+    
+    // Damage type badge
+    let damageTypeBadge = '';
+    if (ability.type && ability.type !== 'passive') {
+        const typeLabels = {
+            physical: 'Physique',
+            magic: 'Magique',
+            true: 'Vrais',
+            utility: 'Utilitaire',
+            buff: 'Buff',
+            defensive: 'Défensif'
+        };
+        damageTypeBadge = `<span class="ability-damage-type ${ability.type}">${typeLabels[ability.type] || ability.type}</span>`;
+    }
+    
+    elements.tooltip.innerHTML = `
+        <div class="ability-tooltip-header">
+            <div class="ability-tooltip-icon ${iconClass}">${ability.icon}</div>
+            <div class="ability-tooltip-title">
+                <span class="ability-tooltip-name">${ability.name}</span>
+                <span class="ability-tooltip-key">${keyLabel}</span>
+            </div>
+        </div>
+        <p class="ability-tooltip-desc">${ability.description}</p>
+        <div class="ability-tooltip-stats">
+            ${statsHtml}
+        </div>
+        ${damageTypeBadge}
+    `;
+    
+    elements.tooltip.style.borderColor = getAbilityBorderColor(type, ability.type);
+    positionTooltip(event);
+    elements.tooltip.classList.add('active');
+}
+
+// Obtenir la couleur de bordure selon le type de compétence
+function getAbilityBorderColor(keyType, damageType) {
+    if (keyType === 'passive') return '#6b4c9a';
+    if (keyType === 'R') return '#ffd700';
+    
+    const colors = {
+        physical: '#ef4444',
+        magic: '#8b5cf6',
+        true: '#eab308',
+        utility: '#22c55e',
+        buff: '#06b6d4',
+        defensive: '#64748b'
+    };
+    
+    return colors[damageType] || '#c8aa6e';
+}
+
+// Positionner le tooltip
+function positionTooltip(event) {
+    const tooltipWidth = 300;
+    const tooltipHeight = elements.tooltip.offsetHeight || 200;
+    
+    let x = event.clientX + 15;
+    let y = event.clientY + 15;
+    
+    // Adjust if tooltip goes off screen
+    if (x + tooltipWidth > window.innerWidth) {
+        x = event.clientX - tooltipWidth - 15;
+    }
+    if (y + tooltipHeight > window.innerHeight) {
+        y = window.innerHeight - tooltipHeight - 10;
+    }
+    
+    elements.tooltip.style.left = x + 'px';
+    elements.tooltip.style.top = y + 'px';
+}
+
+// Cacher le tooltip de compétence
+function hideAbilityTooltip() {
     elements.tooltip.classList.remove('active');
 }
 

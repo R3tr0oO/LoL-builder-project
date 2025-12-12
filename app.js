@@ -202,6 +202,7 @@ function setupEventListeners() {
             defense: null,
         };
         renderSlots();
+        renderItems(); // Re-render pour mettre à jour la surbrillance
         renderPassives();
         renderTreeSelectors();
         renderPrimaryRunes();
@@ -243,6 +244,7 @@ function setupEventListeners() {
             if (e.target.classList.contains('remove-btn')) {
                 delete state.build[slotName];
                 renderSlots();
+                renderItems(); // Re-render pour mettre à jour la surbrillance
                 renderPassives();
                 updateFinalStats();
                 updateTotalGold();
@@ -275,6 +277,23 @@ function setupEventListeners() {
             elements.tooltip.style.top = (e.clientY + 10) + 'px';
         }
     });
+}
+
+// Vérifier si un item est déjà équipé dans le build
+function isItemEquipped(itemId) {
+    return Object.values(state.build).some(item => item && item.id === itemId);
+}
+
+// Vérifier si on a déjà des bottes équipées
+function hasBootsEquipped() {
+    return state.build.boots !== undefined && state.build.boots !== null;
+}
+
+// Obtenir les IDs de tous les items équipés
+function getEquippedItemIds() {
+    return Object.values(state.build)
+        .filter(item => item !== null && item !== undefined)
+        .map(item => item.id);
 }
 
 // Rendu de la grille des champions
@@ -319,10 +338,14 @@ function renderItems() {
         return matchesSearch && matchesCategory;
     });
     
+    // Obtenir les IDs des items équipés
+    const equippedIds = getEquippedItemIds();
+    
     elements.itemCount.textContent = `${filtered.length} items`;
     
     elements.itemsGrid.innerHTML = filtered.map(item => {
         const catConfig = CATEGORY_CONFIG[item.category];
+        const isEquipped = equippedIds.includes(item.id);
         const statsHtml = Object.entries(item.stats).slice(0, 4).map(([stat, value]) => {
             const statConfig = STAT_CONFIG[stat];
             return `<span class="stat-chip">
@@ -332,7 +355,10 @@ function renderItems() {
         }).join('');
         
         return `
-            <div class="item-card" data-id="${item.id}" style="border-color: ${catConfig?.color || '#c8aa6e'}">
+            <div class="item-card ${isEquipped ? 'equipped' : ''}" 
+                 data-id="${item.id}" 
+                 data-equipped="${isEquipped}"
+                 style="border-color: ${catConfig?.color || '#c8aa6e'}">
                 <div class="item-icon category-${item.category}">
                     <span class="icon-emoji">${item.icon}</span>
                 </div>
@@ -348,6 +374,7 @@ function renderItems() {
                     </div>
                     <div class="stats-preview">${statsHtml}</div>
                 </div>
+                ${isEquipped ? '<div class="equipped-indicator">✓</div>' : ''}
                 ${item.passive ? '<div class="passive-indicator">✨</div>' : ''}
             </div>
         `;
@@ -375,7 +402,19 @@ function renderItems() {
 
 // Équiper un item
 function equipItem(item) {
+    // Vérifier si l'item est déjà équipé (pas de doublons)
+    if (isItemEquipped(item.id)) {
+        // Afficher un feedback visuel (optionnel)
+        showNotification(`${item.name} est déjà équipé !`, 'warning');
+        return;
+    }
+    
     if (item.category === 'boots') {
+        // Vérifier si on a déjà des bottes
+        if (hasBootsEquipped()) {
+            showNotification('Vous avez déjà des bottes équipées !', 'warning');
+            return;
+        }
         state.build.boots = item;
     } else if (state.selectedSlot && state.selectedSlot !== 'boots') {
         state.build[state.selectedSlot] = item;
@@ -386,13 +425,44 @@ function equipItem(item) {
         const emptySlot = slots.find(slot => !state.build[slot]);
         if (emptySlot) {
             state.build[emptySlot] = item;
+        } else {
+            showNotification('Tous les slots sont pleins !', 'warning');
+            return;
         }
     }
     
     renderSlots();
+    renderItems(); // Re-render pour mettre à jour la surbrillance
     renderPassives();
     updateFinalStats();
     updateTotalGold();
+}
+
+// Afficher une notification
+function showNotification(message, type = 'info') {
+    // Supprimer les notifications existantes
+    const existingNotif = document.querySelector('.notification');
+    if (existingNotif) {
+        existingNotif.remove();
+    }
+    
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${type}`;
+    notification.innerHTML = `
+        <span class="notification-icon">${type === 'warning' ? '⚠️' : 'ℹ️'}</span>
+        <span class="notification-message">${message}</span>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Animation d'entrée
+    setTimeout(() => notification.classList.add('show'), 10);
+    
+    // Supprimer après 2.5 secondes
+    setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => notification.remove(), 300);
+    }, 2500);
 }
 
 // Rendu des slots

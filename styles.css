@@ -597,7 +597,7 @@ body {
     color: var(--bg-primary);
 }
 
-/* Items Grid */
+/* Items Grid - Limited height for ~9 items visible */
 .items-grid {
     display: flex;
     flex-direction: column;
@@ -605,6 +605,11 @@ body {
     overflow-y: auto;
     flex: 1;
     -webkit-overflow-scrolling: touch;
+    /* Hauteur max pour ~9 items (environ 54px par item) */
+    max-height: calc(9 * 54px);
+    min-height: 200px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--gold) rgba(0, 0, 0, 0.3);
 }
 
 .item-card {
@@ -619,12 +624,48 @@ body {
     transition: all var(--transition-fast);
     position: relative;
     -webkit-tap-highlight-color: transparent;
+    flex-shrink: 0;
 }
 
 .item-card:hover,
 .item-card:active {
     border-color: var(--gold);
     background: rgba(200, 170, 110, 0.08);
+}
+
+/* Item équipé - Surbrillance */
+.item-card.equipped {
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.2), rgba(34, 197, 94, 0.1));
+    border-color: #22c55e !important;
+    box-shadow: 0 0 10px rgba(34, 197, 94, 0.3), inset 0 0 15px rgba(34, 197, 94, 0.1);
+    opacity: 0.85;
+}
+
+.item-card.equipped:hover {
+    opacity: 1;
+    box-shadow: 0 0 15px rgba(34, 197, 94, 0.5), inset 0 0 20px rgba(34, 197, 94, 0.15);
+}
+
+.item-card.equipped .item-name {
+    color: #22c55e;
+}
+
+/* Indicateur équipé */
+.equipped-indicator {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 18px;
+    height: 18px;
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    color: white;
+    font-weight: bold;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 .item-icon {
@@ -1736,6 +1777,54 @@ body {
 .category-boots { background: linear-gradient(135deg, #eab308, #ca8a04); }
 
 /* ========================================
+   NOTIFICATIONS
+   ======================================== */
+.notification {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: linear-gradient(135deg, var(--bg-primary), var(--bg-secondary));
+    border: 2px solid var(--gold);
+    border-radius: var(--radius-lg);
+    padding: var(--space-md) var(--space-lg);
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    z-index: 1001;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+    opacity: 0;
+    transition: all 0.3s ease;
+    max-width: calc(100vw - 40px);
+}
+
+.notification.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+}
+
+.notification-warning {
+    border-color: #f59e0b;
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), var(--bg-secondary));
+}
+
+.notification-info {
+    border-color: #3b82f6;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), var(--bg-secondary));
+}
+
+.notification-icon {
+    font-size: 1.25rem;
+    flex-shrink: 0;
+}
+
+.notification-message {
+    font-size: var(--font-sm);
+    color: var(--text-light);
+    font-weight: 500;
+}
+
+/* ========================================
    TABLET BREAKPOINT (600px+)
    ======================================== */
 @media screen and (min-width: 600px) {
@@ -1795,6 +1884,8 @@ body {
     .items-grid {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
+        /* Hauteur max pour ~6 lignes (3 items par ligne = 18 items) */
+        max-height: calc(6 * 54px);
     }
     
     .champ-stats-grid {
@@ -1857,6 +1948,8 @@ body {
     .items-grid {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
+        /* Hauteur max pour ~3 lignes (3 items par ligne = 9 items) */
+        max-height: calc(3 * 54px);
     }
     
     .champions-grid {
@@ -1911,6 +2004,8 @@ body {
     
     .items-grid {
         grid-template-columns: 1fr;
+        /* En colonne unique, hauteur max pour ~9 items */
+        max-height: calc(9 * 54px);
     }
     
     .item-card:hover {
@@ -1950,6 +2045,8 @@ body {
     .items-grid {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
+        /* En 2 colonnes, hauteur max pour ~5 lignes (10 items) */
+        max-height: calc(5 * 58px);
     }
     
     .item-icon {

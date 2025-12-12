@@ -521,7 +521,9 @@ body {
    ======================================== */
 .shop-panel {
     order: 2;
-    max-height: 45vh;
+    /* Mobile: hauteur limitée */
+    max-height: 50vh;
+    flex: 1;
 }
 
 .search-box {
@@ -597,17 +599,15 @@ body {
     color: var(--bg-primary);
 }
 
-/* Items Grid - Limited height for ~9 items visible */
+/* Items Grid - Prend toute la hauteur disponible */
 .items-grid {
     display: flex;
     flex-direction: column;
     gap: var(--space-xs);
     overflow-y: auto;
     flex: 1;
+    min-height: 0;
     -webkit-overflow-scrolling: touch;
-    /* Hauteur max pour ~9 items (environ 54px par item) */
-    max-height: calc(9 * 54px);
-    min-height: 200px;
     scrollbar-width: thin;
     scrollbar-color: var(--gold) rgba(0, 0, 0, 0.3);
 }
@@ -1884,8 +1884,7 @@ body {
     .items-grid {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
-        /* Hauteur max pour ~6 lignes (3 items par ligne = 18 items) */
-        max-height: calc(6 * 54px);
+        align-content: start;
     }
     
     .champ-stats-grid {
@@ -1948,8 +1947,7 @@ body {
     .items-grid {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
-        /* Hauteur max pour ~3 lignes (3 items par ligne = 9 items) */
-        max-height: calc(3 * 54px);
+        align-content: start;
     }
     
     .champions-grid {
@@ -2004,8 +2002,10 @@ body {
     
     .items-grid {
         grid-template-columns: 1fr;
-        /* En colonne unique, hauteur max pour ~9 items */
-        max-height: calc(9 * 54px);
+        /* Prend toute la hauteur disponible, égale au build-panel */
+        flex: 1;
+        min-height: 0;
+        align-content: start;
     }
     
     .item-card:hover {
@@ -2045,8 +2045,8 @@ body {
     .items-grid {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
-        /* En 2 colonnes, hauteur max pour ~5 lignes (10 items) */
-        max-height: calc(5 * 58px);
+        /* Prend toute la hauteur disponible */
+        align-content: start;
     }
     
     .item-icon {

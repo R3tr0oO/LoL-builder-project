@@ -93,7 +93,12 @@
             <section class="build-panel">
                 <div class="build-header">
                     <h2 class="build-title">🎮 BUILD</h2>
-                    <button class="clear-btn" id="clearBuild">✕ Reset</button>
+                    <div class="build-actions">
+                        <button class="action-btn export-btn" id="exportBuild" title="Exporter le build">📤 Export</button>
+                        <button class="action-btn import-btn" id="importBuild" title="Importer un build">📥 Import</button>
+                        <button class="clear-btn" id="clearBuild">✕ Reset</button>
+                    </div>
+                    <input type="file" id="importFile" accept=".json" style="display: none;">
                 </div>
 
                 <!-- Tabs -->

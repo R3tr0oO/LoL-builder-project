@@ -1,6 +1,10 @@
+// ========================================
+// APP.JS - Application principale
+// ========================================
+
 // État de l'application
 let state = {
-    selectedChampion: CHAMPIONS_DATA[0],
+    selectedChampion: null,
     championLevel: 18,
     build: {},
     selectedSlot: null,
@@ -114,6 +118,20 @@ const elements = {
 
 // Initialisation
 function init() {
+    // Attendre que les données soient chargées
+    if (CHAMPIONS_DATA.length === 0 || ITEMS_DATA.length === 0) {
+        console.log("⏳ Attente du chargement des données...");
+        setTimeout(init, 100);
+        return;
+    }
+    
+    // Sélectionner le premier champion
+    state.selectedChampion = CHAMPIONS_DATA[0];
+    
+    console.log("🎮 Application initialisée");
+    console.log(`   - ${CHAMPIONS_DATA.length} champions disponibles`);
+    console.log(`   - ${ITEMS_DATA.length} items disponibles`);
+    
     renderChampionsGrid();
     renderItems();
     renderTreeSelectors();
@@ -266,7 +284,7 @@ function renderChampionsGrid(search = '') {
     );
     
     elements.championsGrid.innerHTML = filtered.map(champ => `
-        <div class="champ-card ${state.selectedChampion.id === champ.id ? 'selected' : ''}" 
+        <div class="champ-card ${state.selectedChampion?.id === champ.id ? 'selected' : ''}" 
              data-id="${champ.id}"
              style="border-color: ${CATEGORY_CONFIG[champ.role]?.color || '#c8aa6e'}">
             <span class="champ-card-icon">${champ.icon}</span>
@@ -314,15 +332,15 @@ function renderItems() {
         }).join('');
         
         return `
-            <div class="item-card" data-id="${item.id}" style="border-color: ${catConfig.color}">
+            <div class="item-card" data-id="${item.id}" style="border-color: ${catConfig?.color || '#c8aa6e'}">
                 <div class="item-icon category-${item.category}">
                     <span class="icon-emoji">${item.icon}</span>
                 </div>
                 <div class="item-details">
                     <h3 class="item-name">${item.name}</h3>
                     <div class="item-meta">
-                        <span class="category-tag" style="color: ${catConfig.color}; border-color: ${catConfig.color}">
-                            ${catConfig.label}
+                        <span class="category-tag" style="color: ${catConfig?.color || '#c8aa6e'}; border-color: ${catConfig?.color || '#c8aa6e'}">
+                            ${catConfig?.label || item.category}
                         </span>
                         <span class="item-cost">
                             <span class="gold-mini">🪙</span> ${item.cost}
@@ -389,8 +407,8 @@ function renderSlots() {
         
         if (item) {
             const catConfig = CATEGORY_CONFIG[item.category];
-            slotEl.style.borderColor = catConfig.color;
-            slotEl.style.boxShadow = `0 0 15px ${catConfig.color}40`;
+            slotEl.style.borderColor = catConfig?.color || '#c8aa6e';
+            slotEl.style.boxShadow = `0 0 15px ${catConfig?.color || '#c8aa6e'}40`;
             slotEl.innerHTML = `
                 <div class="slot-icon category-${item.category}">
                     <span class="slot-emoji">${item.icon}</span>
@@ -423,7 +441,7 @@ function renderPassives() {
         <div class="passive-card">
             <span class="passive-icon">${item.icon}</span>
             <div class="passive-content">
-                <span class="passive-name">${item.name}</span>
+                <span class="passive-name">${item.passiveName || item.name}</span>
                 <p class="passive-text">${item.passive}</p>
             </div>
         </div>
@@ -433,12 +451,14 @@ function renderPassives() {
 // Mise à jour de l'affichage du champion
 function updateChampionDisplay() {
     const champ = state.selectedChampion;
+    if (!champ) return;
+    
     const catConfig = CATEGORY_CONFIG[champ.role];
     
     elements.championEmoji.textContent = champ.icon;
     elements.championIcon.className = `champion-icon category-${champ.role}`;
     elements.championName.textContent = champ.name;
-    elements.championRole.textContent = catConfig.label;
+    elements.championRole.textContent = catConfig?.label || champ.role;
     
     elements.champStatsIcon.textContent = champ.icon;
     elements.champStatsName.textContent = champ.name;
@@ -450,6 +470,8 @@ function updateChampionDisplay() {
 // Mise à jour des stats du champion
 function updateChampionStats() {
     const champ = state.selectedChampion;
+    if (!champ) return;
+    
     const lvl = state.championLevel - 1;
     const base = champ.baseStats;
     
@@ -485,12 +507,16 @@ function getItemStats() {
 // Calculer les stats du champion au niveau actuel
 function getChampionStats() {
     const champ = state.selectedChampion;
+    if (!champ) return {
+        hp: 0, mana: 0, ad: 0, armor: 0, mr: 0, as: 0.625, ms: 0, range: 0
+    };
+    
     const lvl = state.championLevel - 1;
     const base = champ.baseStats;
     
     return {
         hp: Math.round(base.hp + base.hpGrowth * lvl),
-        mana: Math.round(base.mana + base.manaGrowth * lvl),
+        mana: Math.round((base.mana || 0) + (base.manaGrowth || 0) * lvl),
         ad: Math.round((base.ad + base.adGrowth * lvl) * 10) / 10,
         armor: Math.round((base.armor + base.armorGrowth * lvl) * 10) / 10,
         mr: Math.round((base.mr + base.mrGrowth * lvl) * 10) / 10,
@@ -562,7 +588,7 @@ function updateFinalStats() {
     
     elements.finalLethality.textContent = bonusStats.lethality || 0;
     elements.finalArmorPen.textContent = (bonusStats.armorPen || 0) + '%';
-    elements.finalMpen.textContent = bonusStats.mpen || 0;
+    elements.finalMpen.textContent = bonusStats.magicPen || 0;
     
     elements.finalLifesteal.textContent = (bonusStats.lifesteal || 0) + '%';
     elements.finalOmnivamp.textContent = (bonusStats.omnivamp || 0) + '%';
@@ -599,7 +625,7 @@ function showTooltip(item, event) {
         <div class="tooltip-stats">${statsHtml}</div>
         ${item.passive ? `
             <div class="tooltip-passive">
-                <span class="passive-tag">PASSIF</span>
+                <span class="passive-tag">PASSIF${item.passiveName ? ' - ' + item.passiveName : ''}</span>
                 <p>${item.passive}</p>
             </div>
         ` : ''}
@@ -982,7 +1008,7 @@ function renderAbilities() {
     const champ = state.selectedChampion;
     
     // Check if champion has abilities data
-    if (!champ.passive || !champ.spells) {
+    if (!champ || !champ.passive || !champ.spells) {
         elements.passiveName.textContent = 'N/A';
         elements.qName.textContent = 'N/A';
         elements.wName.textContent = 'N/A';
@@ -1043,7 +1069,7 @@ function setupAbilityTooltips() {
 function showAbilityTooltip(type, event) {
     const champ = state.selectedChampion;
     
-    if (!champ.passive || !champ.spells) return;
+    if (!champ || !champ.passive || !champ.spells) return;
     
     let ability, keyLabel, iconClass;
     
@@ -1068,10 +1094,6 @@ function showAbilityTooltip(type, event) {
                 <span class="ability-stat-label">Cooldown</span>
                 <span class="ability-stat-value cooldown">${ability.cooldown || 'Passif'}</span>
             </div>
-            <div class="ability-stat-row">
-                <span class="ability-stat-label">Scaling</span>
-                <span class="ability-stat-value">${ability.scaling || 'N/A'}</span>
-            </div>
         `;
     } else {
         statsHtml = `
@@ -1092,7 +1114,7 @@ function showAbilityTooltip(type, event) {
     
     // Damage type badge
     let damageTypeBadge = '';
-    if (ability.type && ability.type !== 'passive') {
+    if (ability.damageType && ability.damageType !== 'passive') {
         const typeLabels = {
             physical: 'Physique',
             magic: 'Magique',
@@ -1101,7 +1123,7 @@ function showAbilityTooltip(type, event) {
             buff: 'Buff',
             defensive: 'Défensif'
         };
-        damageTypeBadge = `<span class="ability-damage-type ${ability.type}">${typeLabels[ability.type] || ability.type}</span>`;
+        damageTypeBadge = `<span class="ability-damage-type ${ability.damageType}">${typeLabels[ability.damageType] || ability.damageType}</span>`;
     }
     
     elements.tooltip.innerHTML = `
@@ -1119,7 +1141,7 @@ function showAbilityTooltip(type, event) {
         ${damageTypeBadge}
     `;
     
-    elements.tooltip.style.borderColor = getAbilityBorderColor(type, ability.type);
+    elements.tooltip.style.borderColor = getAbilityBorderColor(type, ability.damageType);
     positionTooltip(event);
     elements.tooltip.classList.add('active');
 }

@@ -275,7 +275,7 @@ body {
     border: 2px solid #c8aa6e;
     border-radius: 12px;
     padding: 20px;
-    max-width: 600px;
+    max-width: 700px;
     max-height: 80vh;
     overflow: hidden;
     display: flex;
@@ -308,10 +308,10 @@ body {
 
 .champions-grid {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(6, 1fr);
     gap: 8px;
     overflow-y: auto;
-    max-height: 400px;
+    max-height: 500px;
     padding: 4px;
 }
 
@@ -1015,10 +1015,6 @@ body {
 .category-support { background: linear-gradient(135deg, #06b6d4, #0891b2); }
 .category-boots { background: linear-gradient(135deg, #eab308, #ca8a04); }
 
-/* ============================================
-   RUNES TAB STYLES
-   ============================================ */
-
 /* Build Tabs */
 .build-tabs {
     display: flex;
@@ -1291,87 +1287,7 @@ body {
     color: #f0e6d2;
 }
 
-/* Rune Summary (in items tab) */
-.rune-summary {
-    margin-top: 8px;
-    padding: 8px;
-    background: rgba(200, 170, 110, 0.08);
-    border-radius: 6px;
-    border: 1px solid rgba(200, 170, 110, 0.15);
-}
-
-.rune-summary-title {
-    font-size: 10px;
-    color: #c8aa6e;
-    margin-bottom: 6px;
-    font-weight: 600;
-}
-
-.rune-summary-content {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-}
-
-.rune-summary-tree {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    font-size: 12px;
-}
-
-.rune-summary-keystone {
-    font-size: 9px;
-    color: #a09b8c;
-}
-
-/* Rune Tooltip */
-.rune-tooltip {
-    position: fixed;
-    z-index: 1001;
-    background: linear-gradient(135deg, #010a13, #0a1428);
-    border: 2px solid;
-    border-radius: 8px;
-    padding: 10px;
-    max-width: 220px;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
-    pointer-events: none;
-    display: none;
-}
-
-.rune-tooltip.active {
-    display: block;
-}
-
-.rune-tooltip-header {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 6px;
-    padding-bottom: 6px;
-    border-bottom: 1px solid rgba(200, 170, 110, 0.2);
-}
-
-.rune-tooltip-icon {
-    font-size: 20px;
-}
-
-.rune-tooltip-name {
-    font-size: 12px;
-    font-weight: 700;
-    color: #f0e6d2;
-}
-
-.rune-tooltip-desc {
-    font-size: 10px;
-    color: #a09b8c;
-    line-height: 1.3;
-}
-
-/* ============================================
-   CHAMPION ABILITIES STYLES
-   ============================================ */
-
+/* Abilities */
 .abilities-section {
     margin-bottom: 10px;
 }
@@ -1515,24 +1431,7 @@ body {
     letter-spacing: 1px;
 }
 
-/* Ability Tooltip */
-.ability-tooltip {
-    position: fixed;
-    z-index: 1002;
-    background: linear-gradient(135deg, #010a13 0%, #0a1428 100%);
-    border: 2px solid #c8aa6e;
-    border-radius: 8px;
-    padding: 12px;
-    max-width: 300px;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.9);
-    pointer-events: none;
-    display: none;
-}
-
-.ability-tooltip.active {
-    display: block;
-}
-
+/* Ability Tooltip Styles */
 .ability-tooltip-header {
     display: flex;
     align-items: center;
@@ -1672,4 +1571,10 @@ body {
     background: rgba(100, 116, 139, 0.2);
     color: #94a3b8;
     border: 1px solid rgba(100, 116, 139, 0.4);
+}
+
+.rune-tooltip-desc {
+    font-size: 10px;
+    color: #a09b8c;
+    line-height: 1.3;
 }

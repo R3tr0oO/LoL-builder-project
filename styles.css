@@ -521,9 +521,7 @@ body {
    ======================================== */
 .shop-panel {
     order: 2;
-    /* Mobile: hauteur limitée */
-    max-height: 50vh;
-    flex: 1;
+    max-height: 45vh;
 }
 
 .search-box {
@@ -599,17 +597,32 @@ body {
     color: var(--bg-primary);
 }
 
-/* Items Grid - Prend toute la hauteur disponible */
+/* Items Grid - Max 10 lignes (20 items en 2 colonnes) avec scroll */
 .items-grid {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
     gap: var(--space-xs);
     overflow-y: auto;
-    flex: 1;
-    min-height: 0;
+    /* 10 lignes max × ~54px par item */
+    max-height: calc(10 * 54px);
     -webkit-overflow-scrolling: touch;
     scrollbar-width: thin;
     scrollbar-color: var(--gold) rgba(0, 0, 0, 0.3);
+    align-content: start;
+}
+
+.items-grid::-webkit-scrollbar {
+    width: 6px;
+}
+
+.items-grid::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 3px;
+}
+
+.items-grid::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, var(--gold), var(--gold-dark));
+    border-radius: 3px;
 }
 
 .item-card {
@@ -761,6 +774,57 @@ body {
    ======================================== */
 .build-panel {
     order: 1;
+}
+
+/* Build Actions (Export/Import/Reset) */
+.build-actions {
+    display: flex;
+    gap: var(--space-xs);
+    align-items: center;
+}
+
+.action-btn {
+    background: rgba(200, 170, 110, 0.15);
+    border: 1px solid rgba(200, 170, 110, 0.3);
+    color: var(--gold);
+    padding: 4px 8px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: var(--font-xs);
+    font-weight: 600;
+    transition: all var(--transition-fast);
+    -webkit-tap-highlight-color: transparent;
+    white-space: nowrap;
+}
+
+.action-btn:hover,
+.action-btn:active {
+    background: rgba(200, 170, 110, 0.25);
+    border-color: var(--gold);
+}
+
+.export-btn {
+    background: rgba(34, 197, 94, 0.15);
+    border-color: rgba(34, 197, 94, 0.3);
+    color: #22c55e;
+}
+
+.export-btn:hover,
+.export-btn:active {
+    background: rgba(34, 197, 94, 0.25);
+    border-color: #22c55e;
+}
+
+.import-btn {
+    background: rgba(59, 130, 246, 0.15);
+    border-color: rgba(59, 130, 246, 0.3);
+    color: #3b82f6;
+}
+
+.import-btn:hover,
+.import-btn:active {
+    background: rgba(59, 130, 246, 0.25);
+    border-color: #3b82f6;
 }
 
 .clear-btn {
@@ -1882,9 +1946,9 @@ body {
     }
     
     .items-grid {
-        display: grid;
         grid-template-columns: repeat(2, 1fr);
-        align-content: start;
+        /* 10 lignes max */
+        max-height: calc(10 * 54px);
     }
     
     .champ-stats-grid {
@@ -1945,9 +2009,9 @@ body {
     }
     
     .items-grid {
-        display: grid;
         grid-template-columns: repeat(3, 1fr);
-        align-content: start;
+        /* 10 lignes max */
+        max-height: calc(10 * 54px);
     }
     
     .champions-grid {
@@ -2002,10 +2066,8 @@ body {
     
     .items-grid {
         grid-template-columns: 1fr;
-        /* Prend toute la hauteur disponible, égale au build-panel */
-        flex: 1;
-        min-height: 0;
-        align-content: start;
+        /* 10 lignes max en 1 colonne = 10 items */
+        max-height: calc(10 * 54px);
     }
     
     .item-card:hover {
@@ -2043,10 +2105,9 @@ body {
     }
     
     .items-grid {
-        display: grid;
         grid-template-columns: repeat(2, 1fr);
-        /* Prend toute la hauteur disponible */
-        align-content: start;
+        /* 10 lignes max en 2 colonnes = 20 items */
+        max-height: calc(10 * 58px);
     }
     
     .item-icon {

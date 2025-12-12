@@ -51,6 +51,9 @@ const elements = {
     
     // Build
     clearBuild: document.getElementById('clearBuild'),
+    exportBuild: document.getElementById('exportBuild'),
+    importBuild: document.getElementById('importBuild'),
+    importFile: document.getElementById('importFile'),
     champStatsIcon: document.getElementById('champStatsIcon'),
     champStatsName: document.getElementById('champStatsName'),
     champStatsLevel: document.getElementById('champStatsLevel'),
@@ -210,6 +213,24 @@ function setupEventListeners() {
         renderShards();
         updateFinalStats();
         updateTotalGold();
+    });
+    
+    // Export build
+    elements.exportBuild.addEventListener('click', () => {
+        exportBuildToJSON();
+    });
+    
+    // Import build
+    elements.importBuild.addEventListener('click', () => {
+        elements.importFile.click();
+    });
+    
+    elements.importFile.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            importBuildFromJSON(file);
+            e.target.value = ''; // Reset pour permettre de réimporter le même fichier
+        }
     });
     
     // Tabs
@@ -404,7 +425,6 @@ function renderItems() {
 function equipItem(item) {
     // Vérifier si l'item est déjà équipé (pas de doublons)
     if (isItemEquipped(item.id)) {
-        // Afficher un feedback visuel (optionnel)
         showNotification(`${item.name} est déjà équipé !`, 'warning');
         return;
     }
@@ -463,6 +483,159 @@ function showNotification(message, type = 'info') {
         notification.classList.remove('show');
         setTimeout(() => notification.remove(), 300);
     }, 2500);
+}
+
+// ============================================
+// IMPORT / EXPORT BUILD
+// ============================================
+
+// Exporter le build en JSON
+function exportBuildToJSON() {
+    // Vérifier si le build est vide
+    const hasItems = Object.values(state.build).some(item => item !== null && item !== undefined);
+    const hasRunes = state.primaryTree !== null || state.selectedRunes.keystone !== null;
+    
+    if (!hasItems && !hasRunes) {
+        showNotification('Aucun build à exporter !', 'warning');
+        return;
+    }
+    
+    // Créer l'objet de build
+    const buildData = {
+        version: '1.0',
+        exportDate: new Date().toISOString(),
+        champion: {
+            id: state.selectedChampion.id,
+            name: state.selectedChampion.name
+        },
+        level: state.championLevel,
+        items: {
+            slot1: state.build.slot1 ? { id: state.build.slot1.id, name: state.build.slot1.name } : null,
+            slot2: state.build.slot2 ? { id: state.build.slot2.id, name: state.build.slot2.name } : null,
+            slot3: state.build.slot3 ? { id: state.build.slot3.id, name: state.build.slot3.name } : null,
+            slot4: state.build.slot4 ? { id: state.build.slot4.id, name: state.build.slot4.name } : null,
+            slot5: state.build.slot5 ? { id: state.build.slot5.id, name: state.build.slot5.name } : null,
+            boots: state.build.boots ? { id: state.build.boots.id, name: state.build.boots.name } : null
+        },
+        runes: {
+            primaryTree: state.primaryTree,
+            secondaryTree: state.secondaryTree,
+            keystone: state.selectedRunes.keystone,
+            primary: state.selectedRunes.primary,
+            secondary: state.selectedRunes.secondary
+        },
+        shards: state.selectedShards
+    };
+    
+    // Créer le fichier JSON
+    const jsonString = JSON.stringify(buildData, null, 2);
+    const blob = new Blob([jsonString], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    
+    // Créer le nom du fichier
+    const champName = state.selectedChampion.name.toLowerCase().replace(/[^a-z0-9]/g, '_');
+    const date = new Date().toISOString().slice(0, 10);
+    const filename = `build_${champName}_${date}.json`;
+    
+    // Télécharger le fichier
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    
+    showNotification('Build exporté avec succès !', 'info');
+}
+
+// Importer un build depuis un fichier JSON
+function importBuildFromJSON(file) {
+    const reader = new FileReader();
+    
+    reader.onload = (e) => {
+        try {
+            const buildData = JSON.parse(e.target.result);
+            
+            // Valider le format
+            if (!buildData.version || !buildData.champion) {
+                throw new Error('Format de fichier invalide');
+            }
+            
+            // Restaurer le champion
+            const champion = CHAMPIONS_DATA.find(c => c.id === buildData.champion.id);
+            if (champion) {
+                state.selectedChampion = champion;
+            } else {
+                showNotification(`Champion "${buildData.champion.name}" non trouvé`, 'warning');
+            }
+            
+            // Restaurer le niveau
+            if (buildData.level >= 1 && buildData.level <= 18) {
+                state.championLevel = buildData.level;
+                elements.levelSlider.value = buildData.level;
+                elements.levelValue.textContent = buildData.level;
+            }
+            
+            // Restaurer les items
+            state.build = {};
+            if (buildData.items) {
+                ['slot1', 'slot2', 'slot3', 'slot4', 'slot5', 'boots'].forEach(slot => {
+                    if (buildData.items[slot] && buildData.items[slot].id) {
+                        const item = ITEMS_DATA.find(i => i.id === buildData.items[slot].id);
+                        if (item) {
+                            state.build[slot] = item;
+                        }
+                    }
+                });
+            }
+            
+            // Restaurer les runes
+            if (buildData.runes) {
+                state.primaryTree = buildData.runes.primaryTree || null;
+                state.secondaryTree = buildData.runes.secondaryTree || null;
+                state.selectedRunes = {
+                    keystone: buildData.runes.keystone || null,
+                    primary: buildData.runes.primary || [null, null, null],
+                    secondary: buildData.runes.secondary || [null, null]
+                };
+            }
+            
+            // Restaurer les shards
+            if (buildData.shards) {
+                state.selectedShards = {
+                    offense: buildData.shards.offense || null,
+                    flex: buildData.shards.flex || null,
+                    defense: buildData.shards.defense || null
+                };
+            }
+            
+            // Mettre à jour l'affichage
+            updateChampionDisplay();
+            updateChampionStats();
+            renderSlots();
+            renderItems();
+            renderPassives();
+            renderTreeSelectors();
+            renderPrimaryRunes();
+            renderSecondaryRunes();
+            renderShards();
+            updateFinalStats();
+            updateTotalGold();
+            
+            showNotification(`Build de ${buildData.champion.name} importé !`, 'info');
+            
+        } catch (error) {
+            console.error('Erreur import:', error);
+            showNotification('Erreur: fichier invalide', 'warning');
+        }
+    };
+    
+    reader.onerror = () => {
+        showNotification('Erreur de lecture du fichier', 'warning');
+    };
+    
+    reader.readAsText(file);
 }
 
 // Rendu des slots

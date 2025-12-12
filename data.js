@@ -112,6 +112,172 @@ const CATEGORY_CONFIG = {
     boots: { label: "Bottes", color: "#eab308" },
 };
 
+// Arbres de runes
+const RUNE_TREES = {
+    precision: {
+        name: "Précision",
+        icon: "⚔️",
+        color: "#c8aa6e",
+        description: "Attaques améliorées et DPS soutenu",
+        keystones: [
+            { id: "pta", name: "Press the Attack", icon: "🎯", description: "Toucher 3 fois un champion lui applique un debuff augmentant les dégâts subis de 8-12%", stats: { bonusDmg: 10 } },
+            { id: "lethal", name: "Lethal Tempo", icon: "⚡", description: "Gagne jusqu'à 90% de vitesse d'attaque bonus en combat (max 6 stacks)", stats: { as: 90 } },
+            { id: "fleet", name: "Fleet Footwork", icon: "💨", description: "Les attaques énergisées soignent et donnent de la vitesse de déplacement", stats: { heal: 10, ms: 20 } },
+            { id: "conqueror", name: "Conqueror", icon: "👑", description: "Gagne de l'AD/AP adaptatif par stack en combat (max 12). À max, soigne pour 8% des dégâts", stats: { ad: 36, omnivamp: 8 } },
+        ],
+        slots: [
+            [
+                { id: "overheal", name: "Overheal", icon: "💚", description: "Le surplus de soin se convertit en bouclier (max 10% PV)", stats: {} },
+                { id: "triumph", name: "Triumph", icon: "🏆", description: "Les takedowns restaurent 10% des PV manquants et donnent 20 or", stats: {} },
+                { id: "pom", name: "Presence of Mind", icon: "💠", description: "Les takedowns restaurent 15% du mana max", stats: {} },
+            ],
+            [
+                { id: "alacrity", name: "Legend: Alacrity", icon: "⚡", description: "Gagne jusqu'à 18% de vitesse d'attaque", stats: { as: 18 } },
+                { id: "bloodline", name: "Legend: Bloodline", icon: "🩸", description: "Gagne jusqu'à 6% de vol de vie", stats: { lifesteal: 6 } },
+                { id: "haste", name: "Legend: Haste", icon: "⏱️", description: "Gagne jusqu'à 15 accélération de compétence", stats: { ah: 15 } },
+            ],
+            [
+                { id: "cdg", name: "Coup de Grace", icon: "💀", description: "+8% dégâts aux cibles sous 40% PV", stats: { bonusDmg: 8 } },
+                { id: "cutdown", name: "Cut Down", icon: "📉", description: "+5-15% dégâts aux cibles avec plus de PV max", stats: { bonusDmg: 10 } },
+                { id: "laststand", name: "Last Stand", icon: "🔥", description: "+5-11% dégâts quand vous êtes sous 60% PV", stats: { bonusDmg: 8 } },
+            ],
+        ]
+    },
+    domination: {
+        name: "Domination",
+        icon: "🗡️",
+        color: "#dc3545",
+        description: "Burst et élimination de cibles",
+        keystones: [
+            { id: "electro", name: "Electrocute", icon: "⚡", description: "Toucher 3 fois un champion inflige des dégâts bonus adaptatifs", stats: { bonusDmg: 180 } },
+            { id: "predator", name: "Predator", icon: "👟", description: "Active les bottes pour +45% MS et dégâts bonus au prochain sort", stats: { ms: 45, bonusDmg: 180 } },
+            { id: "dh", name: "Dark Harvest", icon: "🌙", description: "Les champions sous 50% PV subissent des dégâts bonus qui scale infiniment", stats: { bonusDmg: 40 } },
+            { id: "hob", name: "Hail of Blades", icon: "🔪", description: "Les 3 premières attaques sur un champion ont +110% AS", stats: { as: 110 } },
+        ],
+        slots: [
+            [
+                { id: "cheapshot", name: "Cheap Shot", icon: "🎯", description: "Inflige des dégâts bonus aux cibles avec mouvement réduit", stats: { bonusDmg: 10 } },
+                { id: "taste", name: "Taste of Blood", icon: "🩸", description: "Soigne en touchant un champion (cooldown)", stats: { heal: 18 } },
+                { id: "sudden", name: "Sudden Impact", icon: "💥", description: "Après un dash/blink, gagne létalité et pén. magique", stats: { lethality: 7, mpen: 6 } },
+            ],
+            [
+                { id: "zombie", name: "Zombie Ward", icon: "👁️", description: "Les wards détruits deviennent des wards alliés", stats: {} },
+                { id: "ghost", name: "Ghost Poro", icon: "👻", description: "Un poro fantôme donne de la vision et de l'AD/AP adaptative", stats: { ad: 10 } },
+                { id: "eyeball", name: "Eyeball Collection", icon: "👀", description: "Gagne de l'AD/AP par takedown (max 10 stacks)", stats: { ad: 18 } },
+            ],
+            [
+                { id: "treasure", name: "Treasure Hunter", icon: "💰", description: "Gagne de l'or bonus pour chaque premier takedown unique", stats: {} },
+                { id: "ingenious", name: "Ingenious Hunter", icon: "🔧", description: "Réduit le cooldown des items actifs et de trinket", stats: { ah: 50 } },
+                { id: "relentless", name: "Relentless Hunter", icon: "🏃", description: "Gagne de la vitesse de déplacement hors combat", stats: { ms: 18 } },
+                { id: "ultimate", name: "Ultimate Hunter", icon: "💎", description: "Réduit le cooldown de l'ultime", stats: { ah: 26 } },
+            ],
+        ]
+    },
+    sorcery: {
+        name: "Sorcellerie",
+        icon: "✨",
+        color: "#6f42c1",
+        description: "Sorts amplifiés et manipulation des ressources",
+        keystones: [
+            { id: "comet", name: "Arcane Comet", icon: "☄️", description: "Toucher un champion avec une compétence lance une comète", stats: { bonusDmg: 100 } },
+            { id: "aery", name: "Summon Aery", icon: "🦋", description: "Les sorts offensifs envoient Aery infliger des dégâts, les soins/boucliers l'envoient protéger", stats: { bonusDmg: 50 } },
+            { id: "phaserush", name: "Phase Rush", icon: "💨", description: "Toucher 3 fois un champion donne 40-60% MS pendant 3s", stats: { ms: 50 } },
+        ],
+        slots: [
+            [
+                { id: "null", name: "Nullifying Orb", icon: "🔮", description: "Gagne un bouclier magique quand vous tombez sous 30% PV", stats: {} },
+                { id: "manaflow", name: "Manaflow Band", icon: "💠", description: "Toucher un champion augmente le mana max de 25 (max 250)", stats: { mana: 250 } },
+                { id: "nimbus", name: "Nimbus Cloak", icon: "☁️", description: "Utiliser un sort d'invocateur donne de la vitesse de mouvement", stats: { ms: 35 } },
+            ],
+            [
+                { id: "transcendence", name: "Transcendence", icon: "⏱️", description: "Gagne 10 accélération au niveau 5 et 8. Les takedowns réduisent les cooldowns au niveau 11", stats: { ah: 20 } },
+                { id: "celerity", name: "Celerity", icon: "💨", description: "+7% de tous les bonus de vitesse de mouvement", stats: { ms: 7 } },
+                { id: "absolute", name: "Absolute Focus", icon: "🎯", description: "Gagne de l'AD/AP adaptative quand au-dessus de 70% PV", stats: { ad: 18 } },
+            ],
+            [
+                { id: "scorch", name: "Scorch", icon: "🔥", description: "Les sorts infligent des dégâts brûlants bonus", stats: { bonusDmg: 20 } },
+                { id: "waterwalking", name: "Waterwalking", icon: "🌊", description: "Gagne MS et AD/AP adaptative dans la rivière", stats: { ms: 25, ad: 18 } },
+                { id: "gathering", name: "Gathering Storm", icon: "🌪️", description: "Gagne de l'AD/AP toutes les 10 minutes (sans limite)", stats: { ad: 48 } },
+            ],
+        ]
+    },
+    resolve: {
+        name: "Volonté",
+        icon: "🛡️",
+        color: "#28a745",
+        description: "Durabilité et contrôle de foule",
+        keystones: [
+            { id: "grasp", name: "Grasp of the Undying", icon: "✊", description: "Toutes les 4s en combat, votre prochaine attaque vole des PV", stats: { bonusDmg: 4, heal: 2 } },
+            { id: "aftershock", name: "Aftershock", icon: "💥", description: "Après avoir immobilisé un champion, gagne armure/RM puis explose", stats: { armor: 35, mr: 35, bonusDmg: 120 } },
+            { id: "guardian", name: "Guardian", icon: "🛡️", description: "Protège un allié proche avec un bouclier quand vous subissez des dégâts", stats: {} },
+        ],
+        slots: [
+            [
+                { id: "demolish", name: "Demolish", icon: "🔨", description: "Charge une attaque contre les tourelles pour des dégâts bonus", stats: { bonusDmg: 100 } },
+                { id: "fontoflife", name: "Font of Life", icon: "💧", description: "Les ennemis ralentis/immobilisés soignent les alliés qui les attaquent", stats: {} },
+                { id: "shield", name: "Shield Bash", icon: "🛡️", description: "Après avoir gagné un bouclier, la prochaine attaque fait des dégâts bonus", stats: { bonusDmg: 10 } },
+            ],
+            [
+                { id: "conditioning", name: "Conditioning", icon: "💪", description: "Après 12min, gagne +8 armure et +8 RM, +3% de chaque", stats: { armor: 8, mr: 8 } },
+                { id: "secondwind", name: "Second Wind", icon: "💨", description: "Après avoir subi des dégâts d'un champion, régénère des PV", stats: { hpRegen: 40 } },
+                { id: "boneplating", name: "Bone Plating", icon: "🦴", description: "Les 3 prochaines compétences/attaques ennemies font moins de dégâts", stats: {} },
+            ],
+            [
+                { id: "overgrowth", name: "Overgrowth", icon: "🌱", description: "Gagne +3 PV max par 8 minions morts proches. +3.5% PV max à 120 minions", stats: { hp: 180 } },
+                { id: "revitalize", name: "Revitalize", icon: "💚", description: "+5% soins et boucliers. +10% sur cibles sous 40% PV", stats: { healShield: 10 } },
+                { id: "unflinching", name: "Unflinching", icon: "⚓", description: "Gagne tenacité et slow resist basé sur les PV manquants", stats: { tenacity: 20 } },
+            ],
+        ]
+    },
+    inspiration: {
+        name: "Inspiration",
+        icon: "💡",
+        color: "#17a2b8",
+        description: "Utilitaire et contournement des règles",
+        keystones: [
+            { id: "glacial", name: "Glacial Augment", icon: "❄️", description: "Immobiliser un champion crée une zone de ralentissement", stats: {} },
+            { id: "spellbook", name: "Unsealed Spellbook", icon: "📖", description: "Permet de changer de sorts d'invocateur en jeu", stats: {} },
+            { id: "footwork", name: "First Strike", icon: "💰", description: "Attaquer en premier donne de l'or bonus et 9% dégâts supplémentaires pendant 3s", stats: { bonusDmg: 9 } },
+        ],
+        slots: [
+            [
+                { id: "hexflash", name: "Hextech Flashtraption", icon: "⚡", description: "En combat, le flash peut être canalisé depuis les buissons/FoW", stats: {} },
+                { id: "magicfoot", name: "Magical Footwear", icon: "👟", description: "Gagne des bottes gratuites à 12min (+45s par takedown plus tôt)", stats: { ms: 10 } },
+                { id: "cash", name: "Cash Back", icon: "💸", description: "Récupère 8% du coût des items légendaires achetés", stats: {} },
+            ],
+            [
+                { id: "triple", name: "Triple Tonic", icon: "🧪", description: "Les potions et biscuits donnent aussi MS, mais durent moins", stats: { ms: 5 } },
+                { id: "future", name: "Future's Market", icon: "🏦", description: "Permet d'acheter en dette (frais de 50 or)", stats: {} },
+                { id: "minion", name: "Minion Dematerializer", icon: "💥", description: "3 utilisations pour tuer un minion et faire +6% de dégâts à ce type", stats: {} },
+            ],
+            [
+                { id: "cosmic", name: "Cosmic Insight", icon: "🌌", description: "+18 accélération de sort d'invocateur, +10 accélération d'item", stats: { ah: 10 } },
+                { id: "approach", name: "Approach Velocity", icon: "🏃", description: "+7.5% MS vers les champions alliés CC ou ennemis immobilisés", stats: { ms: 7 } },
+                { id: "jack", name: "Jack of All Trades", icon: "🃏", description: "Gagne des stats bonus pour chaque type de stat possédé", stats: { ah: 10 } },
+            ],
+        ]
+    }
+};
+
+// Shards de stats
+const STAT_SHARDS = {
+    offense: [
+        { id: "as", name: "+10% Vitesse d'attaque", icon: "⚡", stats: { as: 10 } },
+        { id: "adaptive", name: "+9 Force adaptative", icon: "⚔️", stats: { ad: 5.4, ap: 9 } },
+        { id: "ah", name: "+8 Accélération", icon: "⏱️", stats: { ah: 8 } },
+    ],
+    flex: [
+        { id: "adaptive2", name: "+9 Force adaptative", icon: "⚔️", stats: { ad: 5.4, ap: 9 } },
+        { id: "ms", name: "+2% Vitesse de mouvement", icon: "💨", stats: { ms: 2 } },
+        { id: "hp", name: "+10-180 PV (par niveau)", icon: "💚", stats: { hp: 90 } },
+    ],
+    defense: [
+        { id: "hp2", name: "+10-180 PV (par niveau)", icon: "💚", stats: { hp: 90 } },
+        { id: "tenacity", name: "+10% Tenacité et Slow Resist", icon: "⚓", stats: { tenacity: 10 } },
+        { id: "hpflat", name: "+65 PV", icon: "❤️", stats: { hp: 65 } },
+    ]
+};
+
 // Configuration des stats
 const STAT_CONFIG = {
     ad: { label: "Dégâts d'attaque", short: "AD", color: "#f97316" },

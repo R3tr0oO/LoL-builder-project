@@ -96,78 +96,118 @@
                     <button class="clear-btn" id="clearBuild">✕ Reset</button>
                 </div>
 
-                <!-- Champion Stats at Level -->
-                <div class="champ-stats-box">
-                    <div class="champ-stats-header">
-                        <span class="champ-stats-icon" id="champStatsIcon">⚔️</span>
-                        <span class="champ-stats-name" id="champStatsName">Aatrox</span>
-                        <span class="champ-stats-level" id="champStatsLevel">Niv. 18</span>
+                <!-- Tabs -->
+                <div class="build-tabs">
+                    <button class="build-tab active" data-tab="items">🎒 Items</button>
+                    <button class="build-tab" data-tab="runes">✨ Runes</button>
+                </div>
+
+                <!-- Items Tab Content -->
+                <div class="tab-content active" id="itemsTab">
+                    <!-- Champion Stats at Level -->
+                    <div class="champ-stats-box">
+                        <div class="champ-stats-header">
+                            <span class="champ-stats-icon" id="champStatsIcon">⚔️</span>
+                            <span class="champ-stats-name" id="champStatsName">Aatrox</span>
+                            <span class="champ-stats-level" id="champStatsLevel">Niv. 18</span>
+                        </div>
+                        <div class="champ-stats-grid">
+                            <div class="champ-stat">
+                                <span class="champ-stat-value" id="baseHp">0</span>
+                                <span class="champ-stat-label">PV</span>
+                            </div>
+                            <div class="champ-stat">
+                                <span class="champ-stat-value" id="baseAd">0</span>
+                                <span class="champ-stat-label">AD</span>
+                            </div>
+                            <div class="champ-stat">
+                                <span class="champ-stat-value" id="baseArmor">0</span>
+                                <span class="champ-stat-label">Armure</span>
+                            </div>
+                            <div class="champ-stat">
+                                <span class="champ-stat-value" id="baseMr">0</span>
+                                <span class="champ-stat-label">RM</span>
+                            </div>
+                            <div class="champ-stat">
+                                <span class="champ-stat-value" id="baseAs">0</span>
+                                <span class="champ-stat-label">AS</span>
+                            </div>
+                            <div class="champ-stat">
+                                <span class="champ-stat-value" id="baseMs">0</span>
+                                <span class="champ-stat-label">MS</span>
+                            </div>
+                        </div>
                     </div>
-                    <div class="champ-stats-grid">
-                        <div class="champ-stat">
-                            <span class="champ-stat-value" id="baseHp">0</span>
-                            <span class="champ-stat-label">PV</span>
+
+                    <!-- Item Slots -->
+                    <div class="slots-container">
+                        <div class="slots-row">
+                            <div class="slot" data-slot="slot1">
+                                <div class="empty-slot">+</div>
+                                <span class="slot-label">Slot 1</span>
+                            </div>
+                            <div class="slot" data-slot="slot2">
+                                <div class="empty-slot">+</div>
+                                <span class="slot-label">Slot 2</span>
+                            </div>
+                            <div class="slot" data-slot="slot3">
+                                <div class="empty-slot">+</div>
+                                <span class="slot-label">Slot 3</span>
+                            </div>
                         </div>
-                        <div class="champ-stat">
-                            <span class="champ-stat-value" id="baseAd">0</span>
-                            <span class="champ-stat-label">AD</span>
+                        <div class="slots-row-bottom">
+                            <div class="slot" data-slot="slot4">
+                                <div class="empty-slot">+</div>
+                                <span class="slot-label">Slot 4</span>
+                            </div>
+                            <div class="slot" data-slot="slot5">
+                                <div class="empty-slot">+</div>
+                                <span class="slot-label">Slot 5</span>
+                            </div>
+                            <div class="slot boot-slot" data-slot="boots">
+                                <div class="empty-slot">👢</div>
+                                <span class="slot-label">Bottes</span>
+                            </div>
                         </div>
-                        <div class="champ-stat">
-                            <span class="champ-stat-value" id="baseArmor">0</span>
-                            <span class="champ-stat-label">Armure</span>
-                        </div>
-                        <div class="champ-stat">
-                            <span class="champ-stat-value" id="baseMr">0</span>
-                            <span class="champ-stat-label">RM</span>
-                        </div>
-                        <div class="champ-stat">
-                            <span class="champ-stat-value" id="baseAs">0</span>
-                            <span class="champ-stat-label">AS</span>
-                        </div>
-                        <div class="champ-stat">
-                            <span class="champ-stat-value" id="baseMs">0</span>
-                            <span class="champ-stat-label">MS</span>
+                    </div>
+
+                    <!-- Passives -->
+                    <div class="passives-section">
+                        <h3 class="section-title">⚡ Passifs</h3>
+                        <div class="passives-list" id="passivesList">
+                            <p class="empty-passives">Équipez des items avec passifs</p>
                         </div>
                     </div>
                 </div>
 
-                <!-- Item Slots -->
-                <div class="slots-container">
-                    <div class="slots-row">
-                        <div class="slot" data-slot="slot1">
-                            <div class="empty-slot">+</div>
-                            <span class="slot-label">Slot 1</span>
-                        </div>
-                        <div class="slot" data-slot="slot2">
-                            <div class="empty-slot">+</div>
-                            <span class="slot-label">Slot 2</span>
-                        </div>
-                        <div class="slot" data-slot="slot3">
-                            <div class="empty-slot">+</div>
-                            <span class="slot-label">Slot 3</span>
+                <!-- Runes Tab Content -->
+                <div class="tab-content" id="runesTab">
+                    <!-- Primary Tree Selection -->
+                    <div class="rune-section">
+                        <h3 class="rune-section-title">🌳 Arbre Principal</h3>
+                        <div class="tree-selector" id="primaryTreeSelector"></div>
+                        
+                        <!-- Primary Runes -->
+                        <div class="runes-container" id="primaryRunesContainer">
+                            <p class="empty-runes">Sélectionnez un arbre principal</p>
                         </div>
                     </div>
-                    <div class="slots-row-bottom">
-                        <div class="slot" data-slot="slot4">
-                            <div class="empty-slot">+</div>
-                            <span class="slot-label">Slot 4</span>
-                        </div>
-                        <div class="slot" data-slot="slot5">
-                            <div class="empty-slot">+</div>
-                            <span class="slot-label">Slot 5</span>
-                        </div>
-                        <div class="slot boot-slot" data-slot="boots">
-                            <div class="empty-slot">👢</div>
-                            <span class="slot-label">Bottes</span>
-                        </div>
-                    </div>
-                </div>
 
-                <!-- Passives -->
-                <div class="passives-section">
-                    <h3 class="section-title">⚡ Passifs</h3>
-                    <div class="passives-list" id="passivesList">
-                        <p class="empty-passives">Équipez des items avec passifs</p>
+                    <!-- Secondary Tree Selection -->
+                    <div class="rune-section">
+                        <h3 class="rune-section-title">🌿 Arbre Secondaire</h3>
+                        <div class="tree-selector" id="secondaryTreeSelector"></div>
+                        
+                        <!-- Secondary Runes -->
+                        <div class="runes-container secondary" id="secondaryRunesContainer">
+                            <p class="empty-runes">Sélectionnez un arbre secondaire</p>
+                        </div>
+                    </div>
+
+                    <!-- Stat Shards -->
+                    <div class="rune-section">
+                        <h3 class="rune-section-title">💎 Shards de Stats</h3>
+                        <div class="shards-container" id="shardsContainer"></div>
                     </div>
                 </div>
             </section>

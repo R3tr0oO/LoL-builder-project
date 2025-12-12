@@ -6,6 +6,20 @@ let state = {
     selectedSlot: null,
     categoryFilter: 'all',
     searchTerm: '',
+    // Runes
+    primaryTree: null,
+    secondaryTree: null,
+    selectedRunes: {
+        keystone: null,
+        primary: [null, null, null],
+        secondary: [null, null],
+    },
+    selectedShards: {
+        offense: null,
+        flex: null,
+        defense: null,
+    },
+    activeTab: 'items',
 };
 
 // Éléments DOM
@@ -44,6 +58,17 @@ const elements = {
     baseMs: document.getElementById('baseMs'),
     passivesList: document.getElementById('passivesList'),
     
+    // Tabs
+    itemsTab: document.getElementById('itemsTab'),
+    runesTab: document.getElementById('runesTab'),
+    
+    // Runes
+    primaryTreeSelector: document.getElementById('primaryTreeSelector'),
+    secondaryTreeSelector: document.getElementById('secondaryTreeSelector'),
+    primaryRunesContainer: document.getElementById('primaryRunesContainer'),
+    secondaryRunesContainer: document.getElementById('secondaryRunesContainer'),
+    shardsContainer: document.getElementById('shardsContainer'),
+    
     // Stats
     finalAd: document.getElementById('finalAd'),
     finalAp: document.getElementById('finalAp'),
@@ -77,6 +102,8 @@ const elements = {
 function init() {
     renderChampionsGrid();
     renderItems();
+    renderTreeSelectors();
+    renderShards();
     updateChampionDisplay();
     updateChampionStats();
     updateFinalStats();
@@ -128,10 +155,41 @@ function setupEventListeners() {
     elements.clearBuild.addEventListener('click', () => {
         state.build = {};
         state.selectedSlot = null;
+        // Reset runes
+        state.primaryTree = null;
+        state.secondaryTree = null;
+        state.selectedRunes = {
+            keystone: null,
+            primary: [null, null, null],
+            secondary: [null, null],
+        };
+        state.selectedShards = {
+            offense: null,
+            flex: null,
+            defense: null,
+        };
         renderSlots();
         renderPassives();
+        renderTreeSelectors();
+        renderPrimaryRunes();
+        renderSecondaryRunes();
+        renderShards();
         updateFinalStats();
         updateTotalGold();
+    });
+    
+    // Tabs
+    document.querySelectorAll('.build-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            const tabName = tab.dataset.tab;
+            state.activeTab = tabName;
+            
+            document.querySelectorAll('.build-tab').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.getElementById(tabName + 'Tab').classList.add('active');
+        });
     });
     
     // Slots
@@ -419,22 +477,31 @@ function getChampionStats() {
 function updateFinalStats() {
     const champStats = getChampionStats();
     const itemStats = getItemStats();
+    const runeStats = getRuneStats();
+    
+    // Combine item and rune stats
+    const bonusStats = {};
+    [itemStats, runeStats].forEach(source => {
+        Object.entries(source).forEach(([key, value]) => {
+            bonusStats[key] = (bonusStats[key] || 0) + value;
+        });
+    });
     
     // Calculs
-    const totalAD = champStats.ad + (itemStats.ad || 0);
-    const totalAP = itemStats.ap || 0;
-    const totalArmor = champStats.armor + (itemStats.armor || 0);
-    const totalMR = champStats.mr + (itemStats.mr || 0);
-    const totalHP = champStats.hp + (itemStats.hp || 0);
+    const totalAD = champStats.ad + (bonusStats.ad || 0);
+    const totalAP = bonusStats.ap || 0;
+    const totalArmor = champStats.armor + (bonusStats.armor || 0);
+    const totalMR = champStats.mr + (bonusStats.mr || 0);
+    const totalHP = champStats.hp + (bonusStats.hp || 0);
     
-    const bonusAS = itemStats.as || 0;
+    const bonusAS = bonusStats.as || 0;
     const finalAS = Math.min(2.5, champStats.as * (1 + bonusAS / 100));
     const asPercent = Math.round((finalAS / champStats.as - 1) * 100);
     
-    const bonusMSPercent = itemStats.ms || 0;
+    const bonusMSPercent = bonusStats.ms || 0;
     const finalMS = Math.round(champStats.ms * (1 + bonusMSPercent / 100));
     
-    const critChance = Math.min(100, itemStats.crit || 0);
+    const critChance = Math.min(100, bonusStats.crit || 0);
     const hasIE = Object.values(state.build).some(i => i?.name === "Infinity Edge");
     const critMultiplier = critChance >= 60 && hasIE ? 2.15 : 1.75;
     const avgCritMultiplier = 1 + (critChance / 100) * (critMultiplier - 1);
@@ -452,7 +519,7 @@ function updateFinalStats() {
     elements.finalAs.textContent = Math.round(finalAS * 1000) / 1000;
     elements.finalAsPercent.textContent = asPercent + '%';
     elements.finalCrit.textContent = critChance + '%';
-    elements.finalAh.textContent = itemStats.ah || 0;
+    elements.finalAh.textContent = bonusStats.ah || 0;
     
     elements.finalDps.textContent = dps;
     elements.dpsDetail.textContent = `${Math.round(totalAD)} AD × ${(Math.round(finalAS * 100) / 100)} AS × ${critChance}% Crit`;
@@ -466,13 +533,13 @@ function updateFinalStats() {
     elements.ehpPhys.textContent = effectiveHPPhysical.toLocaleString();
     elements.ehpMag.textContent = effectiveHPMagic.toLocaleString();
     
-    elements.finalLethality.textContent = itemStats.lethality || 0;
-    elements.finalArmorPen.textContent = (itemStats.armorPen || 0) + '%';
-    elements.finalMpen.textContent = itemStats.mpen || 0;
+    elements.finalLethality.textContent = bonusStats.lethality || 0;
+    elements.finalArmorPen.textContent = (bonusStats.armorPen || 0) + '%';
+    elements.finalMpen.textContent = bonusStats.mpen || 0;
     
-    elements.finalLifesteal.textContent = (itemStats.lifesteal || 0) + '%';
-    elements.finalOmnivamp.textContent = (itemStats.omnivamp || 0) + '%';
-    elements.finalTenacity.textContent = (itemStats.tenacity || 0) + '%';
+    elements.finalLifesteal.textContent = (bonusStats.lifesteal || 0) + '%';
+    elements.finalOmnivamp.textContent = (bonusStats.omnivamp || 0) + '%';
+    elements.finalTenacity.textContent = (bonusStats.tenacity || 0) + '%';
     
     elements.finalMs.textContent = finalMS;
     elements.finalRange.textContent = champStats.range;
@@ -518,6 +585,364 @@ function showTooltip(item, event) {
 
 // Cacher le tooltip
 function hideTooltip() {
+    elements.tooltip.classList.remove('active');
+}
+
+// ============================================
+// RUNES FUNCTIONS
+// ============================================
+
+// Rendu des sélecteurs d'arbre
+function renderTreeSelectors() {
+    // Primary tree selector
+    elements.primaryTreeSelector.innerHTML = Object.entries(RUNE_TREES).map(([key, tree]) => {
+        const isActive = state.primaryTree === key;
+        return `
+            <button class="tree-btn ${isActive ? 'active' : ''}" 
+                    data-tree="${key}" 
+                    data-type="primary"
+                    style="--tree-color: ${tree.color}; --tree-color-glow: ${tree.color}40">
+                <span class="tree-btn-icon">${tree.icon}</span>
+                <span class="tree-btn-name">${tree.name}</span>
+            </button>
+        `;
+    }).join('');
+    
+    // Secondary tree selector
+    elements.secondaryTreeSelector.innerHTML = Object.entries(RUNE_TREES).map(([key, tree]) => {
+        const isActive = state.secondaryTree === key;
+        const isDisabled = state.primaryTree === key;
+        return `
+            <button class="tree-btn ${isActive ? 'active' : ''} ${isDisabled ? 'disabled' : ''}" 
+                    data-tree="${key}" 
+                    data-type="secondary"
+                    ${isDisabled ? 'disabled' : ''}
+                    style="--tree-color: ${tree.color}; --tree-color-glow: ${tree.color}40">
+                <span class="tree-btn-icon">${tree.icon}</span>
+                <span class="tree-btn-name">${tree.name}</span>
+            </button>
+        `;
+    }).join('');
+    
+    // Event listeners
+    document.querySelectorAll('.tree-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            if (btn.disabled) return;
+            const treeKey = btn.dataset.tree;
+            const type = btn.dataset.type;
+            
+            if (type === 'primary') {
+                state.primaryTree = treeKey;
+                state.selectedRunes.keystone = null;
+                state.selectedRunes.primary = [null, null, null];
+                // Reset secondary if same tree
+                if (state.secondaryTree === treeKey) {
+                    state.secondaryTree = null;
+                    state.selectedRunes.secondary = [null, null];
+                }
+            } else {
+                state.secondaryTree = treeKey;
+                state.selectedRunes.secondary = [null, null];
+            }
+            
+            renderTreeSelectors();
+            renderPrimaryRunes();
+            renderSecondaryRunes();
+            updateFinalStats();
+        });
+    });
+}
+
+// Rendu des runes principales
+function renderPrimaryRunes() {
+    if (!state.primaryTree) {
+        elements.primaryRunesContainer.innerHTML = '<p class="empty-runes">Sélectionnez un arbre principal</p>';
+        return;
+    }
+    
+    const tree = RUNE_TREES[state.primaryTree];
+    
+    let html = '';
+    
+    // Keystones
+    html += `<div class="rune-row keystone-row" style="--tree-color: ${tree.color}; --tree-color-glow: ${tree.color}40">`;
+    tree.keystones.forEach(keystone => {
+        const isSelected = state.selectedRunes.keystone === keystone.id;
+        html += `
+            <div class="rune-slot keystone ${isSelected ? 'selected' : ''}" 
+                 data-rune-id="${keystone.id}" 
+                 data-rune-type="keystone"
+                 style="--tree-color: ${tree.color}">
+                <span class="rune-slot-icon">${keystone.icon}</span>
+                <span class="rune-slot-name">${keystone.name}</span>
+            </div>
+        `;
+    });
+    html += '</div>';
+    
+    // Minor runes
+    tree.slots.forEach((slot, slotIndex) => {
+        html += `<div class="rune-row" style="--tree-color: ${tree.color}">`;
+        slot.forEach(rune => {
+            const isSelected = state.selectedRunes.primary[slotIndex] === rune.id;
+            html += `
+                <div class="rune-slot ${isSelected ? 'selected' : ''}" 
+                     data-rune-id="${rune.id}" 
+                     data-rune-type="primary"
+                     data-slot-index="${slotIndex}"
+                     style="--tree-color: ${tree.color}">
+                    <span class="rune-slot-icon">${rune.icon}</span>
+                    <span class="rune-slot-name">${rune.name}</span>
+                </div>
+            `;
+        });
+        html += '</div>';
+    });
+    
+    elements.primaryRunesContainer.innerHTML = html;
+    
+    // Event listeners
+    elements.primaryRunesContainer.querySelectorAll('.rune-slot').forEach(slot => {
+        slot.addEventListener('click', () => {
+            const runeId = slot.dataset.runeId;
+            const type = slot.dataset.runeType;
+            
+            if (type === 'keystone') {
+                state.selectedRunes.keystone = runeId;
+            } else {
+                const slotIndex = parseInt(slot.dataset.slotIndex);
+                state.selectedRunes.primary[slotIndex] = runeId;
+            }
+            
+            renderPrimaryRunes();
+            updateFinalStats();
+        });
+        
+        slot.addEventListener('mouseenter', (e) => {
+            const runeId = slot.dataset.runeId;
+            const type = slot.dataset.runeType;
+            let rune;
+            
+            if (type === 'keystone') {
+                rune = tree.keystones.find(k => k.id === runeId);
+            } else {
+                const slotIndex = parseInt(slot.dataset.slotIndex);
+                rune = tree.slots[slotIndex].find(r => r.id === runeId);
+            }
+            
+            if (rune) showRuneTooltip(rune, tree.color, e);
+        });
+        
+        slot.addEventListener('mouseleave', hideRuneTooltip);
+    });
+}
+
+// Rendu des runes secondaires
+function renderSecondaryRunes() {
+    if (!state.secondaryTree) {
+        elements.secondaryRunesContainer.innerHTML = '<p class="empty-runes">Sélectionnez un arbre secondaire</p>';
+        return;
+    }
+    
+    const tree = RUNE_TREES[state.secondaryTree];
+    
+    let html = '<div class="secondary-slots">';
+    
+    // All minor runes from secondary tree (flatten all slots)
+    const allRunes = [];
+    tree.slots.forEach((slot, slotIndex) => {
+        slot.forEach(rune => {
+            allRunes.push({ ...rune, slotIndex });
+        });
+    });
+    
+    allRunes.forEach(rune => {
+        const isSelected = state.selectedRunes.secondary.includes(rune.id);
+        html += `
+            <div class="rune-slot secondary-slot ${isSelected ? 'selected' : ''}" 
+                 data-rune-id="${rune.id}" 
+                 data-slot-index="${rune.slotIndex}"
+                 style="--tree-color: ${tree.color}">
+                <span class="rune-slot-icon">${rune.icon}</span>
+                <span class="rune-slot-name">${rune.name}</span>
+            </div>
+        `;
+    });
+    
+    html += '</div>';
+    elements.secondaryRunesContainer.innerHTML = html;
+    
+    // Event listeners
+    elements.secondaryRunesContainer.querySelectorAll('.rune-slot').forEach(slot => {
+        slot.addEventListener('click', () => {
+            const runeId = slot.dataset.runeId;
+            const slotIndex = parseInt(slot.dataset.slotIndex);
+            
+            // Check if already selected
+            const currentIndex = state.selectedRunes.secondary.indexOf(runeId);
+            if (currentIndex !== -1) {
+                // Deselect
+                state.selectedRunes.secondary[currentIndex] = null;
+            } else {
+                // Check if same slot already has a selection
+                const sameSlotRune = tree.slots[slotIndex].map(r => r.id);
+                const existingFromSameSlot = state.selectedRunes.secondary.findIndex(id => 
+                    id && sameSlotRune.includes(id)
+                );
+                
+                if (existingFromSameSlot !== -1) {
+                    // Replace same-slot selection
+                    state.selectedRunes.secondary[existingFromSameSlot] = runeId;
+                } else {
+                    // Find empty spot
+                    const emptyIndex = state.selectedRunes.secondary.indexOf(null);
+                    if (emptyIndex !== -1) {
+                        state.selectedRunes.secondary[emptyIndex] = runeId;
+                    } else {
+                        // Replace oldest
+                        state.selectedRunes.secondary[0] = state.selectedRunes.secondary[1];
+                        state.selectedRunes.secondary[1] = runeId;
+                    }
+                }
+            }
+            
+            renderSecondaryRunes();
+            updateFinalStats();
+        });
+        
+        slot.addEventListener('mouseenter', (e) => {
+            const runeId = slot.dataset.runeId;
+            const slotIndex = parseInt(slot.dataset.slotIndex);
+            const rune = tree.slots[slotIndex].find(r => r.id === runeId);
+            if (rune) showRuneTooltip(rune, tree.color, e);
+        });
+        
+        slot.addEventListener('mouseleave', hideRuneTooltip);
+    });
+}
+
+// Rendu des shards
+function renderShards() {
+    const rows = ['offense', 'flex', 'defense'];
+    
+    let html = '';
+    rows.forEach(rowName => {
+        html += '<div class="shard-row">';
+        STAT_SHARDS[rowName].forEach(shard => {
+            const isSelected = state.selectedShards[rowName] === shard.id;
+            html += `
+                <div class="shard-slot ${isSelected ? 'selected' : ''}" 
+                     data-shard-id="${shard.id}" 
+                     data-shard-row="${rowName}">
+                    <span class="shard-slot-icon">${shard.icon}</span>
+                    <span class="shard-slot-name">${shard.name}</span>
+                </div>
+            `;
+        });
+        html += '</div>';
+    });
+    
+    elements.shardsContainer.innerHTML = html;
+    
+    // Event listeners
+    elements.shardsContainer.querySelectorAll('.shard-slot').forEach(slot => {
+        slot.addEventListener('click', () => {
+            const shardId = slot.dataset.shardId;
+            const row = slot.dataset.shardRow;
+            
+            if (state.selectedShards[row] === shardId) {
+                state.selectedShards[row] = null;
+            } else {
+                state.selectedShards[row] = shardId;
+            }
+            
+            renderShards();
+            updateFinalStats();
+        });
+    });
+}
+
+// Calculer les stats des runes
+function getRuneStats() {
+    const stats = {};
+    
+    // Keystone
+    if (state.primaryTree && state.selectedRunes.keystone) {
+        const tree = RUNE_TREES[state.primaryTree];
+        const keystone = tree.keystones.find(k => k.id === state.selectedRunes.keystone);
+        if (keystone?.stats) {
+            Object.entries(keystone.stats).forEach(([key, value]) => {
+                stats[key] = (stats[key] || 0) + value;
+            });
+        }
+    }
+    
+    // Primary runes
+    if (state.primaryTree) {
+        const tree = RUNE_TREES[state.primaryTree];
+        state.selectedRunes.primary.forEach((runeId, slotIndex) => {
+            if (runeId) {
+                const rune = tree.slots[slotIndex].find(r => r.id === runeId);
+                if (rune?.stats) {
+                    Object.entries(rune.stats).forEach(([key, value]) => {
+                        stats[key] = (stats[key] || 0) + value;
+                    });
+                }
+            }
+        });
+    }
+    
+    // Secondary runes
+    if (state.secondaryTree) {
+        const tree = RUNE_TREES[state.secondaryTree];
+        state.selectedRunes.secondary.forEach(runeId => {
+            if (runeId) {
+                for (const slot of tree.slots) {
+                    const rune = slot.find(r => r.id === runeId);
+                    if (rune?.stats) {
+                        Object.entries(rune.stats).forEach(([key, value]) => {
+                            stats[key] = (stats[key] || 0) + value;
+                        });
+                        break;
+                    }
+                }
+            }
+        });
+    }
+    
+    // Shards
+    Object.entries(state.selectedShards).forEach(([row, shardId]) => {
+        if (shardId) {
+            const shard = STAT_SHARDS[row].find(s => s.id === shardId);
+            if (shard?.stats) {
+                Object.entries(shard.stats).forEach(([key, value]) => {
+                    stats[key] = (stats[key] || 0) + value;
+                });
+            }
+        }
+    });
+    
+    return stats;
+}
+
+// Tooltip pour les runes
+function showRuneTooltip(rune, color, event) {
+    elements.tooltip.innerHTML = `
+        <div class="tooltip-header" style="border-bottom-color: ${color}40">
+            <span class="tooltip-icon">${rune.icon}</span>
+            <div>
+                <h4 class="tooltip-name" style="color: ${color}">${rune.name}</h4>
+            </div>
+        </div>
+        <p class="rune-tooltip-desc">${rune.description}</p>
+    `;
+    elements.tooltip.style.borderColor = color;
+    elements.tooltip.style.left = Math.min(event.clientX + 10, window.innerWidth - 240) + 'px';
+    elements.tooltip.style.top = (event.clientY + 10) + 'px';
+    elements.tooltip.classList.add('active');
+}
+
+function hideRuneTooltip() {
     elements.tooltip.classList.remove('active');
 }
 

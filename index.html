@@ -66,7 +66,7 @@
             <!-- Left - Item Shop -->
             <section class="shop-panel">
                 <div class="shop-header">
-                    <h2 class="shop-title">🏪 BOUTIQUE</h2>
+                    <h2 class="shop-title">🪧 BOUTIQUE</h2>
                     <span class="item-count" id="itemCount">0 items</span>
                 </div>
 
@@ -325,7 +325,7 @@
                         <h4 class="group-title"><span class="group-icon">❤️</span> Sustain</h4>
                         <div class="calc-stat-row"><span class="calc-stat-label">Vol de vie</span><span class="calc-stat-value" id="finalLifesteal" style="color: #ef4444">0%</span></div>
                         <div class="calc-stat-row"><span class="calc-stat-label">Omnivamp</span><span class="calc-stat-value" id="finalOmnivamp" style="color: #be123c">0%</span></div>
-                        <div class="calc-stat-row"><span class="calc-stat-label">Tenacité</span><span class="calc-stat-value" id="finalTenacity" style="color: #d946ef">0%</span></div>
+                        <div class="calc-stat-row"><span class="calc-stat-label">Ténacité</span><span class="calc-stat-value" id="finalTenacity" style="color: #d946ef">0%</span></div>
                     </div>
 
                     <!-- Movement -->
@@ -342,7 +342,45 @@
         <div class="tooltip" id="tooltip"></div>
     </div>
 
+    <!-- ========================================
+         SCRIPTS - ORDRE DE CHARGEMENT IMPORTANT
+         ======================================== -->
+    
+    <!-- 1. Base de données des items -->
+    <script src="items_database.js"></script>
+    
+    <!-- 2. Champions par lettre (A-Z) -->
+    <script src="champions/champions_A.js"></script>
+    <script src="champions/champions_B.js"></script>
+    <script src="champions/champions_C.js"></script>
+    <script src="champions/champions_D.js"></script>
+    <script src="champions/champions_E.js"></script>
+    <script src="champions/champions_F.js"></script>
+    <script src="champions/champions_G.js"></script>
+    <script src="champions/champions_H.js"></script>
+    <script src="champions/champions_I.js"></script>
+    <script src="champions/champions_J.js"></script>
+    <script src="champions/champions_K.js"></script>
+    <script src="champions/champions_L.js"></script>
+    <script src="champions/champions_M.js"></script>
+    <script src="champions/champions_N.js"></script>
+    <script src="champions/champions_O.js"></script>
+    <script src="champions/champions_P.js"></script>
+    <script src="champions/champions_Q.js"></script>
+    <script src="champions/champions_R.js"></script>
+    <script src="champions/champions_S.js"></script>
+    <script src="champions/champions_T.js"></script>
+    <script src="champions/champions_U.js"></script>
+    <script src="champions/champions_V.js"></script>
+    <script src="champions/champions_W.js"></script>
+    <script src="champions/champions_X.js"></script>
+    <script src="champions/champions_Y.js"></script>
+    <script src="champions/champions_Z.js"></script>
+    
+    <!-- 3. Data.js (combine les données + runes + config) -->
     <script src="data.js"></script>
+    
+    <!-- 4. Application principale -->
     <script src="app.js"></script>
 </body>
 </html>

@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LoL Item Builder - League of Legends</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <div class="bg-hex-pattern"></div>
+        <div class="bg-glow"></div>
+
+        <!-- Header -->
+        <header class="header">
+            <div class="logo-section">
+                <div class="logo">
+                    <span class="logo-icon">⚔</span>
+                    <div class="logo-text">
+                        <h1 class="title">ITEM BUILDER</h1>
+                        <span class="subtitle">LEAGUE OF LEGENDS</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Champion Selector -->
+            <div class="champion-selector">
+                <div class="selected-champion" id="selectedChampion">
+                    <div class="champion-icon" id="championIcon">
+                        <span class="champ-emoji" id="championEmoji">⚔️</span>
+                    </div>
+                    <div class="champion-info">
+                        <span class="champion-name" id="championName">Aatrox</span>
+                        <span class="champion-role" id="championRole">Fighter</span>
+                    </div>
+                    <span class="dropdown-arrow">▼</span>
+                </div>
+
+                <!-- Level Selector -->
+                <div class="level-selector">
+                    <span class="level-label">Niv.</span>
+                    <input type="range" min="1" max="18" value="18" class="level-slider" id="levelSlider">
+                    <span class="level-value" id="levelValue">18</span>
+                </div>
+            </div>
+
+            <div class="gold-display">
+                <span class="gold-icon">🪙</span>
+                <span class="gold-value" id="totalGold">0</span>
+                <span class="gold-label">OR</span>
+            </div>
+        </header>
+
+        <!-- Champion Selection Modal -->
+        <div class="modal-overlay" id="championModal">
+            <div class="champion-modal">
+                <h3 class="modal-title">Sélectionner un Champion</h3>
+                <input type="text" placeholder="Rechercher..." class="modal-search" id="championSearch">
+                <div class="champions-grid" id="championsGrid"></div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <main class="main">
+            <!-- Left - Item Shop -->
+            <section class="shop-panel">
+                <div class="shop-header">
+                    <h2 class="shop-title">🏪 BOUTIQUE</h2>
+                    <span class="item-count" id="itemCount">0 items</span>
+                </div>
+
+                <div class="search-box">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" placeholder="Rechercher un item..." class="search-input" id="itemSearch">
+                </div>
+
+                <div class="category-filters" id="categoryFilters">
+                    <button class="category-btn active" data-category="all">Tous</button>
+                    <button class="category-btn" data-category="fighter">Fighter</button>
+                    <button class="category-btn" data-category="mage">Mage</button>
+                    <button class="category-btn" data-category="tank">Tank</button>
+                    <button class="category-btn" data-category="marksman">Marksman</button>
+                    <button class="category-btn" data-category="assassin">Assassin</button>
+                    <button class="category-btn" data-category="support">Support</button>
+                    <button class="category-btn" data-category="boots">Bottes</button>
+                </div>
+
+                <div class="items-grid" id="itemsGrid"></div>
+            </section>
+
+            <!-- Center - Build -->
+            <section class="build-panel">
+                <div class="build-header">
+                    <h2 class="build-title">🎮 BUILD</h2>
+                    <button class="clear-btn" id="clearBuild">✕ Reset</button>
+                </div>
+
+                <!-- Champion Stats at Level -->
+                <div class="champ-stats-box">
+                    <div class="champ-stats-header">
+                        <span class="champ-stats-icon" id="champStatsIcon">⚔️</span>
+                        <span class="champ-stats-name" id="champStatsName">Aatrox</span>
+                        <span class="champ-stats-level" id="champStatsLevel">Niv. 18</span>
+                    </div>
+                    <div class="champ-stats-grid">
+                        <div class="champ-stat">
+                            <span class="champ-stat-value" id="baseHp">0</span>
+                            <span class="champ-stat-label">PV</span>
+                        </div>
+                        <div class="champ-stat">
+                            <span class="champ-stat-value" id="baseAd">0</span>
+                            <span class="champ-stat-label">AD</span>
+                        </div>
+                        <div class="champ-stat">
+                            <span class="champ-stat-value" id="baseArmor">0</span>
+                            <span class="champ-stat-label">Armure</span>
+                        </div>
+                        <div class="champ-stat">
+                            <span class="champ-stat-value" id="baseMr">0</span>
+                            <span class="champ-stat-label">RM</span>
+                        </div>
+                        <div class="champ-stat">
+                            <span class="champ-stat-value" id="baseAs">0</span>
+                            <span class="champ-stat-label">AS</span>
+                        </div>
+                        <div class="champ-stat">
+                            <span class="champ-stat-value" id="baseMs">0</span>
+                            <span class="champ-stat-label">MS</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Item Slots -->
+                <div class="slots-container">
+                    <div class="slots-row">
+                        <div class="slot" data-slot="slot1">
+                            <div class="empty-slot">+</div>
+                            <span class="slot-label">Slot 1</span>
+                        </div>
+                        <div class="slot" data-slot="slot2">
+                            <div class="empty-slot">+</div>
+                            <span class="slot-label">Slot 2</span>
+                        </div>
+                        <div class="slot" data-slot="slot3">
+                            <div class="empty-slot">+</div>
+                            <span class="slot-label">Slot 3</span>
+                        </div>
+                    </div>
+                    <div class="slots-row-bottom">
+                        <div class="slot" data-slot="slot4">
+                            <div class="empty-slot">+</div>
+                            <span class="slot-label">Slot 4</span>
+                        </div>
+                        <div class="slot" data-slot="slot5">
+                            <div class="empty-slot">+</div>
+                            <span class="slot-label">Slot 5</span>
+                        </div>
+                        <div class="slot boot-slot" data-slot="boots">
+                            <div class="empty-slot">👢</div>
+                            <span class="slot-label">Bottes</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Passives -->
+                <div class="passives-section">
+                    <h3 class="section-title">⚡ Passifs</h3>
+                    <div class="passives-list" id="passivesList">
+                        <p class="empty-passives">Équipez des items avec passifs</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Right - Calculated Stats -->
+            <section class="stats-panel">
+                <div class="stats-header">
+                    <h2 class="stats-title">📊 STATS FINALES</h2>
+                </div>
+
+                <div class="stats-content">
+                    <!-- Combat Stats -->
+                    <div class="stat-group">
+                        <h4 class="group-title"><span class="group-icon">⚔️</span> Combat</h4>
+                        <div class="calc-stat-row"><span class="calc-stat-label">Dégâts d'attaque</span><span class="calc-stat-value" id="finalAd" style="color: #f97316">0</span></div>
+                        <div class="calc-stat-row"><span class="calc-stat-label">Puissance magique</span><span class="calc-stat-value" id="finalAp" style="color: #8b5cf6">0</span></div>
+                        <div class="calc-stat-row"><span class="calc-stat-label">Vitesse d'attaque</span><span class="calc-stat-value" id="finalAs" style="color: #facc15">0</span></div>
+                        <div class="calc-stat-row"><span class="calc-stat-label">Bonus AS</span><span class="calc-stat-value" id="finalAsPercent" style="color: #facc15">0%</span></div>
+                        <div class="calc-stat-row"><span class="calc-stat-label">Chance critique</span><span class="calc-stat-value" id="finalCrit" style="color: #f43f5e">0%</span></div>
+                        <div class="calc-stat-row"><span class="calc-stat-label">Accélération</span><span class="calc-stat-value" id="finalAh" style="color: #ec4899">0</span></div>
+                    </div>
+
+                    <!-- DPS Calculator -->
+                    <div class="dps-box">
+                        <div class="dps-header">
+                            <span>⚡ DPS Auto-Attaques</span>
+                            <span class="dps-value" id="finalDps">0</span>
+                        </div>
+                        <div class="dps-detail" id="dpsDetail">0 AD × 0 AS × 0% Crit</div>
+                    </div>
+
+                    <!-- Defensive Stats -->
+                    <div class="stat-group">
+                        <h4 class="group-title"><span class="group-icon">🛡️</span> Défense</h4>
+                        <div class="calc-stat-row"><span class="calc-stat-label">Points de vie</span><span class="calc-stat-value" id="finalHp" style="color: #22c55e">0</span></div>
+                        <div class="calc-stat-row"><span class="calc-stat-label">Armure</span><span class="calc-stat-value" id="finalArmor" style="color: #eab308">0</span></div>
+                        <div class="calc-stat-row"><span class="calc-stat-label">Résist. magique</span><span class="calc-stat-value" id="finalMr" style="color: #a855f7">0</span></div>
+                        <div class="calc-stat-row"><span class="calc-stat-label">Réduc. physique</span><span class="calc-stat-value" id="finalPhysRed" style="color: #eab308">0%</span></div>
+                        <div class="calc-stat-row"><span class="calc-stat-label">Réduc. magique</span><span class="calc-stat-value" id="finalMagRed" style="color: #a855f7">0%</span></div>
+                    </div>
+
+                    <!-- Effective HP -->
+                    <div class="ehp-box">
+                        <h4 class="ehp-title">💪 PV Effectifs</h4>
+                        <div class="ehp-row">
+                            <span class="ehp-label">vs Physique</span>
+                            <span class="ehp-value" id="ehpPhys" style="color: #eab308">0</span>
+                        </div>
+                        <div class="ehp-row">
+                            <span class="ehp-label">vs Magique</span>
+                            <span class="ehp-value" id="ehpMag" style="color: #a855f7">0</span>
+                        </div>
+                    </div>
+
+                    <!-- Penetration -->
+                    <div class="stat-group">
+                        <h4 class="group-title"><span class="group-icon">🎯</span> Pénétration</h4>
+                        <div class="calc-stat-row"><span class="calc-stat-label">Létalité</span><span class="calc-stat-value" id="finalLethality" style="color: #6366f1">0</span></div>
+                        <div class="calc-stat-row"><span class="calc-stat-label">% Pén. armure</span><span class="calc-stat-value" id="finalArmorPen" style="color: #f59e0b">0%</span></div>
+                        <div class="calc-stat-row"><span class="calc-stat-label">Pén. magique</span><span class="calc-stat-value" id="finalMpen" style="color: #c084fc">0</span></div>
+                    </div>
+
+                    <!-- Sustain -->
+                    <div class="stat-group">
+                        <h4 class="group-title"><span class="group-icon">❤️</span> Sustain</h4>
+                        <div class="calc-stat-row"><span class="calc-stat-label">Vol de vie</span><span class="calc-stat-value" id="finalLifesteal" style="color: #ef4444">0%</span></div>
+                        <div class="calc-stat-row"><span class="calc-stat-label">Omnivamp</span><span class="calc-stat-value" id="finalOmnivamp" style="color: #be123c">0%</span></div>
+                        <div class="calc-stat-row"><span class="calc-stat-label">Tenacité</span><span class="calc-stat-value" id="finalTenacity" style="color: #d946ef">0%</span></div>
+                    </div>
+
+                    <!-- Movement -->
+                    <div class="stat-group">
+                        <h4 class="group-title"><span class="group-icon">🏃</span> Mobilité</h4>
+                        <div class="calc-stat-row"><span class="calc-stat-label">Vitesse de déplacement</span><span class="calc-stat-value" id="finalMs" style="color: #14b8a6">0</span></div>
+                        <div class="calc-stat-row"><span class="calc-stat-label">Portée AA</span><span class="calc-stat-value" id="finalRange" style="color: #9ca3af">0</span></div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Tooltip -->
+        <div class="tooltip" id="tooltip"></div>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
